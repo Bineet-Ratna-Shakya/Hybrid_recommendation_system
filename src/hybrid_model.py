@@ -1,21 +1,19 @@
-# hybrid_model.py
-import pandas as pd
+from collaborative_filtering import CollaborativeFiltering
+from content_based_filtering import ContentBasedFiltering
 
 class HybridModel:
-    def __init__(self, collaborative_model, content_model):
-        self.collaborative_model = collaborative_model
-        self.content_model = content_model
-
-    def combine_results(self, show_id, weight_collab=0.5, weight_content=0.5):
-        # Combine recommendations from both models
-        collab_recs = self.collaborative_model.recommend_items(show_id)
-        content_recs = self.content_model.recommend_similar_items(show_id)
-
-        combined_recs = collab_recs.add(content_recs, fill_value=0)
-        combined_recs = (weight_collab * collab_recs).add(weight_content * content_recs, fill_value=0)
-        return combined_recs.sort_values(ascending=False)
-
-    def recommend(self, show_id, num_recommendations=5):
-        # Get hybrid recommendations
-        recommendations = self.combine_results(show_id)
-        return recommendations.head(num_recommendations)
+    def __init__(self, data):
+        self.data = data
+        self.collab_model = CollaborativeFiltering(data)
+        self.content_model = ContentBasedFiltering(data)
+    
+    def recommend(self, movie_title, top_n=10):
+        # Get recommendations from both models
+        collab_recommendations = set(self.collab_model.recommend(movie_title, top_n))
+        content_recommendations = set(self.content_model.recommend(movie_title, top_n))
+        
+        # Combine recommendations
+        combined_recommendations = list(collab_recommendations.union(content_recommendations))
+        
+        # Return top N unique recommendations
+        return combined_recommendations[:top_n]

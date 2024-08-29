@@ -1,29 +1,35 @@
-# content_based_filtering.py
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
 class ContentBasedFiltering:
-    def __init__(self, data_path):
-        self.data = pd.read_csv(data_path)
-        self.tfidf_matrix = self.create_tfidf_matrix()
-        self.similarity_matrix = self.calculate_similarity()
-
-    def create_tfidf_matrix(self):
-        # Use 'description' or 'listed_in' for TF-IDF vectorization
-        tfidf = TfidfVectorizer(stop_words='english')
-        tfidf_matrix = tfidf.fit_transform(self.data['description'])  # Adjust column as necessary
-        return tfidf_matrix
-
-    def calculate_similarity(self):
-        # Calculate cosine similarity between items
-        cosine_sim = cosine_similarity(self.tfidf_matrix, self.tfidf_matrix)
-        return pd.DataFrame(cosine_sim, index=self.data['show_id'], columns=self.data['show_id'])
-
-    def recommend_similar_items(self, show_id, num_recommendations=5):
-        if show_id not in self.similarity_matrix.index:
-            raise ValueError(f"Show ID {show_id} not found in the data.")
+    def __init__(self, data):
+        self.data = data
+        self.tfidf_matrix = None
+    
+    def prepare_data(self):
+        # Combine relevant features into a single string for each movie
+        self.data['content'] = self.data['description'] + ' ' + self.data['cast'] + ' ' + self.data['listed_in']
         
-        # Sort similar items
-        similar_items = self.similarity_matrix[show_id].sort_values(ascending=False).drop(show_id)
-        return similar_items.head(num_recommendations)
+        # Initialize TF-IDF Vectorizer
+        tfidf = TfidfVectorizer(stop_words='english')
+        self.tfidf_matrix = tfidf.fit_transform(self.data['content'])
+    
+    def recommend(self, movie_title, top_n=10):
+        if self.tfidf_matrix is None:
+            self.prepare_data()
+        
+        # Get index of the movie
+        movie_idx = self.data[self.data['title'].str.lower() == movie_title.lower()].index[0]
+        
+        # Compute similarity based on content
+        cosine_sim = cosine_similarity(self.tfidf_matrix, self.tfidf_matrix)
+        
+        # Get similar movies
+        similar_movies = list(enumerate(cosine_sim[movie_idx]))
+        similar_movies = sorted(similar_movies, key=lambda x: x[1], reverse=True)
+        
+        # Recommend top N movies
+        recommended_movies = [self.data['title'].iloc[i[0]] for i in similar_movies[1:top_n+1]]
+        
+        return recommended_movies
