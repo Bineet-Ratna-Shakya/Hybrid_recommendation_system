@@ -1,44 +1,49 @@
 import pandas as pd
-from sklearn.metrics.pairwise import cosine_similarity
+from scipy.sparse.linalg import svds
+import numpy as np
 
 class CollaborativeFiltering:
     def __init__(self, data):
         self.data = data
-        self.genre_matrix = None
-        self.director_matrix = None
+        self.user_item_matrix = None
+        self.U, self.sigma, self.Vt = None, None, None
+        self.movie_indices = None
     
     def prepare_data(self):
-        # Create a matrix for genres
-        genre_data = self.data['listed_in'].str.get_dummies(sep=', ')
-        director_data = self.data['director'].str.get_dummies(sep=', ')
+        # Generate a user-item interaction matrix
+        self.user_item_matrix = pd.get_dummies(self.data['title']).values
         
-        # Combine the matrices
-        self.genre_matrix = genre_data
-        self.director_matrix = director_data
+        # Convert to float type for SVD
+        self.user_item_matrix = self.user_item_matrix.astype(float)
         
-    def get_similarity(self, matrix):
-        # Calculate the cosine similarity between items
-        return cosine_similarity(matrix)
+        # Decompose the matrix using SVD with a smaller k value
+        num_users, num_movies = self.user_item_matrix.shape
+        k = min(num_users - 1, num_movies - 1, 10)  # Adjust k based on matrix size
+        
+        self.U, self.sigma, self.Vt = svds(self.user_item_matrix, k=k)
+        
+        # Convert sigma to a diagonal matrix
+        self.sigma = np.diag(self.sigma)
+        
+        # Store movie indices for lookup
+        self.movie_indices = pd.get_dummies(self.data['title']).columns
     
     def recommend(self, movie_title, top_n=10):
-        if self.genre_matrix is None or self.director_matrix is None:
+        if self.U is None or self.sigma is None or self.Vt is None:
             self.prepare_data()
         
-        # Get index of the movie
-        movie_idx = self.data[self.data['title'].str.lower() == movie_title.lower()].index[0]
+        # Find the index of the movie
+        if movie_title not in self.movie_indices:
+            return []
+        movie_idx = self.movie_indices.get_loc(movie_title)
         
-        # Compute similarity based on genres and directors
-        genre_sim = self.get_similarity(self.genre_matrix)
-        director_sim = self.get_similarity(self.director_matrix)
+        # Predict scores by multiplying the decomposed matrices
+        predicted_scores = np.dot(np.dot(self.U, self.sigma), self.Vt)
         
-        # Combine the similarities
-        combined_sim = (genre_sim + director_sim) / 2
-        
-        # Get similar movies
-        similar_movies = list(enumerate(combined_sim[movie_idx]))
-        similar_movies = sorted(similar_movies, key=lambda x: x[1], reverse=True)
+        # Sort and get the indices of the top similar movies
+        similar_movies_idx = np.argsort(predicted_scores[:, movie_idx])[::-1]
         
         # Recommend top N movies
-        recommended_movies = [self.data['title'].iloc[i[0]] for i in similar_movies[1:top_n+1]]
+        recommended_movies = self.movie_indices[similar_movies_idx[1:top_n+1]].tolist()
         
         return recommended_movies
