@@ -9,7 +9,10 @@ class ContentBasedFiltering:
     
     def prepare_data(self):
         # Combine relevant features into a single string for each movie
-        self.data['content'] = self.data['description'] + ' ' + self.data['cast'] + ' ' + self.data['listed_in']
+        self.data['content'] = self.data['description'].fillna('') + ' ' + \
+                               self.data['cast'].fillna('') + ' ' + \
+                               self.data['listed_in'].fillna('') + ' ' + \
+                               self.data['director'].fillna('')
         
         # Initialize TF-IDF Vectorizer
         tfidf = TfidfVectorizer(stop_words='english')
