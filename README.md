@@ -298,14 +298,57 @@ class HybridFiltering:
 - **main branch**: Implements the hybrid recommendation system using collaborative filtering (SVD) and content-based filtering (TF-IDF and Cosine Similarity).
 - **deep-learning branch**: Enhances the hybrid model with deep learning techniques like Neural Collaborative Filtering (NCF) or Autoencoders.
 
-## Contributing
+# References
 
-Contributions are welcome! Please fork this repository and submit a pull request for any enhancements or bug fixes.
+## General Recommender System Resources
 
-## License
+- [IJISRT Paper on Recommender Systems](https://ijisrt.com/assets/upload/files/IJISRT22APR1053_(1).pdf)
+- [Comprehensive Guide to Recommendation Engines in Python](https://www.analyticsvidhya.com/blog/2018/06/comprehensive-guide-recommendation-engine-python/)
+- [Recommender Systems Tutorial on DataCamp](https://www.datacamp.com/tutorial/recommender-systems-python)
+- [Movie Recommendation System Dataset on Kaggle](https://www.kaggle.com/datasets/parasharmanas/movie-recommendation-system)
+- [How to Build a Movie Recommendation System Based on Collaborative Filtering](https://www.freecodecamp.org/news/how-to-build-a-movie-recommendation-system-based-on-collaborative-filtering/)
+- [Deep Learning-Based Recommender Systems on Kaggle](https://www.kaggle.com/code/jamesloy/deep-learning-based-recommender-systems)
+- [Content-Based and Collaborative Filtering on Kaggle](https://www.kaggle.com/code/indralin/try-content-based-and-collaborative-filtering)
+- [Building a Hybrid Content-Collaborative Movie Recommender Using Deep Learning](https://towardsdatascience.com/building-a-hybrid-content-collaborative-movie-recommender-using-deep-learning-22f99c838f55)
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+## Data Cleaning
 
-## Contact
+- [Data Cleaning with Pandas and Python - Real Python](https://realpython.com/python-data-cleaning-numpy-pandas/)
+- [Data Cleaning in Python - Towards Data Science](https://towardsdatascience.com/the-art-of-data-cleaning-in-python-dbc944b8f8e2)
+- [Handling Missing Data - Pandas Documentation](https://pandas.pydata.org/pandas-docs/stable/user_guide/missing_data.html)
 
-For any questions or feedback, please contact [Your Name] at [your.email@example.com].
+## Data Normalization
+
+- [Data Normalization Techniques - Towards Data Science](https://towardsdatascience.com/data-normalization-in-machine-learning-395fdec69d02)
+
+## Collaborative Filtering
+
+- [Collaborative Filtering Model - Towards Data Science](https://towardsdatascience.com/building-a-collaborative-filtering-model-from-scratch-in-python-7ff992a12d9e)
+- [Matrix Factorization Algorithms - Surprise Library](https://surprise.readthedocs.io/en/stable/matrix_factorization.html)
+- [Matrix Factorization for Recommender Systems - Towards Data Science](https://towardsdatascience.com/matrix-factorization-for-recommender-systems-3b5922d3c5c8)
+- [SVD for Collaborative Filtering - Medium](https://medium.com/analytics-vidhya/collaborative-filtering-using-singular-value-decomposition-in-python-743d1577f7a2)
+
+## Content-Based Filtering
+
+- [Content-Based Recommender Systems - Towards Data Science](https://towardsdatascience.com/building-a-content-based-book-recommendation-engine-for-an-amazon-like-bookstore-d9b78d7de93)
+- [TF-IDF Vectorizer - Scikit-Learn Documentation](https://scikit-learn.org/stable/modules/feature_extraction.html#tfidf-term-weighting)
+- [Feature Extraction with TF-IDF - Real Python](https://realpython.com/python-keras-text-classification/)
+- [Cosine Similarity - Scikit-Learn Documentation](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.pairwise.cosine_similarity.html)
+
+## Hybrid Recommendation Systems
+
+- [Hybrid Content-Collaborative Recommender System - Towards Data Science](https://towardsdatascience.com/building-a-hybrid-content-collaborative-movie-recommender-using-deep-learning-22f99c838f55)
+- [Hybrid Recommendation Engine - Analytics Vidhya](https://www.analyticsvidhya.com/blog/2018/06/comprehensive-guide-recommendation-engine-python/)
+- [Combining Models for Hybrid Recommendations - Medium](https://medium.com/@sarojkarna/hybrid-recommender-systems-using-python-7f74a7d5e4b2)
+
+## Evaluation and Visualization
+
+- [Evaluation Metrics for Recommender Systems - Towards Data Science](https://towardsdatascience.com/evaluation-metrics-for-recommender-systems-df56c6611093)
+- [A Practical Guide to Evaluating Recommender Systems - Medium](https://medium.com/@shaileshkramcharran/which-evaluation-metrics-should-i-use-to-evaluate-recommendation-systems-7e2cf1301d0c)
+
+## Optional Features
+
+- [Neural Collaborative Filtering (PDF)](https://arxiv.org/pdf/1708.05031.pdf)
+- [Neural Collaborative Filtering with Keras - Towards Data Science](https://towardsdatascience.com/neural-collaborative-filtering-and-implementation-with-keras-5a8a3a5a7ab2)
+- [Autoencoders for Collaborative Filtering - Medium](https://medium.com/analytics-vidhya/autoencoders-collaborative-filtering-for-recommendation-systems-d4f6bff6d10a)
+
