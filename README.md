@@ -11,6 +11,7 @@ This project implements a hybrid recommendation system that combines collaborati
 - [Getting Started](#getting-started)
 - [Features](#features)
 - [File Structure](#file-structure)
+- [How To Run](#how-to-run)
 - [Logic Overview](#logic-overview)
   - [Collaborative Filtering](#collaborative-filtering)
   - [Content-Based Filtering](#content-based-filtering)
@@ -18,9 +19,7 @@ This project implements a hybrid recommendation system that combines collaborati
 - [Built With](#built-with)
 - [Usage](#usage)
 - [Branches](#branches)
-- [Contributing](#contributing)
-- [License](#license)
-- [Contact](#contact)
+
 
 ## Getting Started
 
@@ -65,6 +64,60 @@ Make sure you have the following installed:
     ```bash
     python main.py
     ```
+
+## How To Run
+Usage
+Prepare your dataset:
+
+Make sure you have a dataset in CSV format. The file should be located at /your_path/hybrid_recommendation_system/data/Netflix-encoded-Data.csv. Adjust the path in the script if necessary.
+
+Run the recommendation system:
+
+Execute the main.py script to start the recommendation system:
+
+```
+python main.py
+```
+Interact with the system:
+
+Enter a movie title when prompted.
+The system will display recommendations based on content-based filtering, collaborative filtering, and hybrid filtering.
+You can continue to get recommendations for other movies or exit the program.
+
+```
+WELCOME TO THE HYBRID RECOMMENDATION SYSTEM
+========================================
+
+Enter a movie title (or type 'exit' to quit): Inception
+
+========================================
+GENERATING RECOMMENDATIONS...
+========================================
+
+--- Content-Based Recommendations ---
+1. The Dark Knight
+2. Interstellar
+3. Memento
+...
+
+--- Collaborative Recommendations ---
+1. Tenet
+2. The Prestige
+3. Insomnia
+...
+
+--- Hybrid Recommendations ---
+1. Dunkirk
+2. Shutter Island
+3. The Matrix
+...
+
+Do you want to get recommendations for another movie? (yes/no): no
+Thank you for using the recommendation system. Goodbye!
+```
+Notes
+Ensure your dataset is properly encoded and preprocessed as expected by the scripts.
+You may need to adjust model parameters based on your specific requirements and dataset.
 
 ## Features
 
