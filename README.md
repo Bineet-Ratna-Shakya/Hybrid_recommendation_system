@@ -222,6 +222,37 @@ The Hybrid Model combines both Collaborative Filtering and Content-Based Filteri
 - The hybrid model calls both the recommend methods from `ContentBasedFiltering` and `CollaborativeFiltering`.
 - It merges these recommendations into a single list (with or without additional weighting or prioritization logic). The merged list is truncated to the top N recommendations.
 
+#Deep Learning Model
+# Neural Collaborative Filtering (NCF) Logic
+
+Neural Collaborative Filtering (NCF) uses neural networks to learn user and item embeddings for making personalized recommendations. Here's a brief overview of the logic and important code points:
+
+## Key Logic
+
+1. **Data Preparation:**
+   - Convert the user-item interaction matrix to a DataFrame.
+   - Encode user and movie IDs to numeric values.
+
+2. **Model Building:**
+   - **Inputs:**
+     - `user_input`: Input for user IDs.
+     - `movie_input`: Input for movie IDs.
+   - **Embedding Layers:**
+     - `user_embedding`: Maps user IDs to dense vectors.
+     - `movie_embedding`: Maps movie IDs to dense vectors.
+   - **Concatenation:**
+     - Combine user and movie embeddings.
+   - **Hidden Layers:**
+     - Dense layer with ReLU activation.
+   - **Output Layer:**
+     - Dense layer with sigmoid activation for binary rating prediction.
+
+3. **Training:**
+   - Fit the model using user and movie indices along with ratings.
+
+4. **Recommendation Generation:**
+   - Predict ratings for all movies for a given user.
+   - Return top-N movies based on predicted ratings.
 
 **Code snippet**:
 
