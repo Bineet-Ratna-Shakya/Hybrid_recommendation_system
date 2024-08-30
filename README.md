@@ -92,7 +92,6 @@ Synthetic User Generation is a technique used to enhance the performance of Coll
 
 ### Problem with Sparsity:
 - In a typical user-item matrix, many users may have rated only a few items. This leads to sparsity, which makes it difficult to learn meaningful patterns for recommendation.
-- A sparsity problem can reduce the accuracy of collaborative filtering models since these models rely heavily on the similarity between user preferences.
 
 ### Generating Synthetic Users:
 - **Synthetic users** are artificial entities created to mimic potential user behaviors. These users are generated based on certain rules or by sampling from the existing distribution of user ratings.
@@ -222,7 +221,7 @@ The Hybrid Model combines both Collaborative Filtering and Content-Based Filteri
 - The hybrid model calls both the recommend methods from `ContentBasedFiltering` and `CollaborativeFiltering`.
 - It merges these recommendations into a single list (with or without additional weighting or prioritization logic). The merged list is truncated to the top N recommendations.
 
-#Deep Learning Model
+# Deep Learning Model
 # Neural Collaborative Filtering (NCF) Logic
 
 Neural Collaborative Filtering (NCF) uses neural networks to learn user and item embeddings for making personalized recommendations. Here's a brief overview of the logic and important code points:
@@ -246,9 +245,6 @@ Neural Collaborative Filtering (NCF) uses neural networks to learn user and item
      - Dense layer with ReLU activation.
    - **Output Layer:**
      - Dense layer with sigmoid activation for binary rating prediction.
-
-3. **Training:**
-   - Fit the model using user and movie indices along with ratings.
 
 4. **Recommendation Generation:**
    - Predict ratings for all movies for a given user.
