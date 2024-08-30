@@ -84,13 +84,58 @@ Make sure you have the following installed:
 - `main.py`: The main script to run the recommendation system.
 
 ## Logic Overview
+# Synthetic User Generation in Collaborative Filtering
 
-### Collaborative Filtering
+Synthetic User Generation is a technique used to enhance the performance of Collaborative Filtering, especially when there is limited data or sparse interactions (i.e., few ratings per user). The idea is to generate synthetic users or ratings to augment the existing dataset, making the recommendation model more robust.
 
-The Collaborative Filtering approach is based on Singular Value Decomposition (SVD). It uses a user-item interaction matrix to make recommendations.
+## How It Works
 
-- **Data Preparation**: Converts the user-item matrix to a sparse format and performs SVD.
-- **Recommendation**: Predicts movie scores for users by reconstructing the user-item matrix using the decomposed matrices. Recommends the top N movies with the highest predicted scores.
+### Problem with Sparsity:
+- In a typical user-item matrix, many users may have rated only a few items. This leads to sparsity, which makes it difficult to learn meaningful patterns for recommendation.
+- A sparsity problem can reduce the accuracy of collaborative filtering models since these models rely heavily on the similarity between user preferences.
+
+### Generating Synthetic Users:
+- **Synthetic users** are artificial entities created to mimic potential user behaviors. These users are generated based on certain rules or by sampling from the existing distribution of user ratings.
+- Synthetic users can be designed to represent a specific segment of users (e.g., movie enthusiasts who rate high, critics who rate low, etc.).
+
+### Augmenting the Dataset:
+- By adding these synthetic users, the density of the user-item matrix increases, allowing the model to learn more robust patterns.
+- For example, synthetic ratings can be generated for items that are underrepresented (few users have rated them) or for new items that haven't been rated yet.
+
+### Methodology for Creating Synthetic Users:
+1. **Use clustering algorithms** like K-Means to group existing users based on their rating patterns. Each cluster represents a unique user behavior profile.
+2. **Generate synthetic users** by sampling from these clusters or by creating new users who rate according to the centroid of each cluster.
+3. **Assign these synthetic users** with ratings based on average cluster behavior, noise addition, or domain-specific rules (e.g., favoring certain genres or directors).
+
+### Benefits:
+- This approach helps mitigate cold-start problems (e.g., new users with no ratings or new items with few ratings).
+- Improves model training by providing more data points, leading to better generalization and accuracy of recommendations.
+
+# 1. Collaborative Filtering
+
+Collaborative Filtering is a recommendation approach that relies on user-item interactions to predict user preferences. In this case, it uses Singular Value Decomposition (SVD) to decompose the user-item matrix, which represents how users rate or interact with different movies.
+
+### How It Works
+
+#### Data Preparation:
+- The input is a user-item matrix where rows represent users and columns represent movies. The matrix values are user ratings or some form of interaction score (e.g., how much a user likes or watches a movie).
+- This matrix is converted to a sparse format using `csr_matrix` from `scipy.sparse` to handle the typically large size and sparsity (many missing values) efficiently.
+- Singular Value Decomposition (SVD) is applied to the matrix. SVD decomposes the matrix M into three matrices: U, Σ (sigma), and Vt.
+  - **U:** Represents the relationship between users and the latent factors. It is a user matrix where each row represents a user, and each column represents a latent factor.
+  - **Σ (sigma):** A diagonal matrix containing singular values that capture the importance of each latent factor.
+  - **Vt:** Represents the relationship between movies and latent factors. It is a transposed movie matrix where each row represents a movie, and each column represents a latent factor.
+- The value of k determines the number of latent factors to retain (a smaller number to reduce complexity and noise).
+
+#### Recommendation Generation:
+- To generate recommendations for a specific user, the algorithm reconstructs the user-item matrix using the formula:
+
+  \[
+  \text{Predicted Scores} = U \cdot Σ \cdot V^T
+  \]
+
+- This multiplication gives the predicted score for each movie for the user.
+- The movies are sorted based on their predicted scores for the user, and the top N movies with the highest scores are recommended.
+
 
 **Code snippet**:
 
@@ -119,12 +164,23 @@ class CollaborativeFiltering:
         return recommended_items
 ```
 
-### Content-Based Filtering
+## 2. Content-Based Filtering
 
-The Content-Based Filtering approach uses TF-IDF vectorization and cosine similarity to recommend movies similar to a given movie.
+Content-Based Filtering recommends movies based on their features, such as the movie's description, cast, genres, and director. It uses TF-IDF (Term Frequency-Inverse Document Frequency) and cosine similarity to find similar items.
 
-- **Data Preparation**: Combines multiple text-based features (e.g., description, cast, genres) into a single content string for each movie. Computes the TF-IDF matrix for these features.
-- **Recommendation**: Calculates the cosine similarity between the TF-IDF vectors of the target movie and all other movies. Recommends the top N most similar movies.
+### How It Works
+
+#### Data Preparation:
+- The content features (e.g., description, cast, genres, director) of each movie are combined into a single string. This step ensures that all relevant information about a movie is considered when calculating its similarity to other movies.
+- The TF-IDF Vectorizer converts the combined content strings into a TF-IDF matrix:
+  - TF-IDF calculates the importance of words in the context of each movie's content. It considers both the frequency of a word in a specific movie and its rarity across all movies.
+  - This matrix is high-dimensional, with each row representing a movie and each column representing a word in the movie descriptions.
+
+#### Recommendation Generation:
+- **Cosine Similarity** is computed between the target movie's TF-IDF vector and all other movies' vectors:
+  - Cosine similarity measures the cosine of the angle between two vectors in a multi-dimensional space. It provides a metric of how similar two movies are based on their content.
+- Movies are sorted based on their similarity scores to the target movie. The top N most similar movies are recommended.
+
 
 **Code snippet**:
 
@@ -151,11 +207,21 @@ class ContentBasedFiltering:
         return recommended_movies
 ```
 
-### Hybrid Model
+## 3. Hybrid Model
 
-The Hybrid Model combines both collaborative and content-based filtering approaches to provide a more comprehensive recommendation system.
+The Hybrid Model combines both Collaborative Filtering and Content-Based Filtering approaches to leverage the strengths of both methods and provide more comprehensive recommendations.
 
-- **Recommendation**: Merges the results from both collaborative and content-based methods. This approach captures both user preferences and content similarities to improve recommendation quality.
+### How It Works
+
+#### Combining the Approaches:
+- **Content-Based Recommendations:** Uses the Content-Based Filtering method to generate recommendations based on the similarity of content to a given movie.
+- **Collaborative Recommendations:** Uses the Collaborative Filtering method to generate recommendations based on user interactions.
+- The model merges both recommendation sets to provide a list that captures both user preferences (from collaborative filtering) and content similarities (from content-based filtering).
+
+#### Recommendation Generation:
+- The hybrid model calls both the recommend methods from `ContentBasedFiltering` and `CollaborativeFiltering`.
+- It merges these recommendations into a single list (with or without additional weighting or prioritization logic). The merged list is truncated to the top N recommendations.
+
 
 **Code snippet**:
 
@@ -175,6 +241,11 @@ class HybridFiltering:
         hybrid_recommendations = list(set(content_recommendations + collab_recommendations))[:top_n]
         return hybrid_recommendations
 ```
+### Summary of Logic:
+
+- **Collaborative Filtering:** Learns from user behavior (e.g., movie ratings) to predict preferences for unseen movies.
+- **Content-Based Filtering:** Utilizes movie metadata (e.g., description, cast) to find movies similar to what a user already likes.
+- **Hybrid Model:** Integrates both methods to provide a more robust recommendation by capturing both user preferences and movie content similarities. This approach helps in scenarios where either collaborative or content-based filtering alone might fail (e.g., when a user has rated very few movies or when new movies lack sufficient user interaction data).
 
 ## Built With
 
