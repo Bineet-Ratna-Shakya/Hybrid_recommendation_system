@@ -7,7 +7,7 @@ from keras._tf_keras.keras.optimizers import Adam
 from keras._tf_keras.keras.callbacks import EarlyStopping
 from keras._tf_keras.keras.regularizers import l2
 from sklearn.model_selection import train_test_split
-
+#deep learning
 class NeuralCollaborativeFiltering:
     """
     A class to implement Neural Collaborative Filtering (NCF) using TensorFlow/Keras.
