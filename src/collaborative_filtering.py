@@ -71,7 +71,7 @@ class CollaborativeFiltering:
         
         return recommended_items
 
-def generate_synthetic_user_item_matrix(data, num_users=100, seed=42):
+def generate_synthetic_user_item_matrix(data, num_users=10, seed=42):
     """
     Generates a synthetic user-item interaction matrix with random ratings.
     

@@ -1,13 +1,22 @@
 import pandas as pd
 from collaborative_filtering import CollaborativeFiltering, generate_synthetic_user_item_matrix
 from content_based_filtering import ContentBasedFiltering
+from deep_learning_model import NeuralCollaborativeFiltering
 from hybrid_model import HybridFiltering
 
+# Load and preprocess the data
 data_cleaned = pd.read_csv('/Users/soul/Documents/hybrid_recommendation_system/data/Netflix-encoded-Data.csv')
-content_filter = ContentBasedFiltering(data_cleaned)
+
+# Generate user-item matrix and movie titles
 user_item_matrix, movie_titles = generate_synthetic_user_item_matrix(data_cleaned)
+
+# Initialize models
+content_filter = ContentBasedFiltering(data_cleaned)
 collab_filter = CollaborativeFiltering(user_item_matrix, movie_titles)
-hybrid_filter = HybridFiltering(data_cleaned, user_item_matrix, movie_titles)
+
+# Initialize and prepare the Hybrid Filtering model with Neural Collaborative Filtering
+hybrid_filter = HybridFiltering(data_cleaned, user_item_matrix, movie_titles, embedding_dim=20)
+hybrid_filter.prepare_models()
 
 def get_movie_title(data):
     """
@@ -25,7 +34,9 @@ def get_movie_title(data):
             print("Exiting the program. Goodbye!")
             exit()
         elif movie_title.lower() in data['title'].str.lower().values:
-            return movie_title
+            # Fetch exact title case-insensitively
+            correct_title = data[data['title'].str.lower() == movie_title.lower()]['title'].values[0]
+            return correct_title
         else:
             print(f"Movie title '{movie_title}' not found in the dataset. Please try again.")
 
@@ -73,10 +84,12 @@ while True:
     print("GENERATING RECOMMENDATIONS...")
     print("="*40)
 
+    # Content-Based Recommendations
     content_recommendations = content_filter.recommend(movie_title)
     display_recommendations("Content-Based Recommendations", content_recommendations)
 
-    collaborative_recommendations = collab_filter.recommend(user_idx=0)
+    # Collaborative Recommendations
+    collaborative_recommendations = collab_filter.recommend(user_idx=0)  # Ensure user_idx is valid
     display_recommendations("Collaborative Recommendations", collaborative_recommendations)
 
     # Hybrid Filtering Recommendations
