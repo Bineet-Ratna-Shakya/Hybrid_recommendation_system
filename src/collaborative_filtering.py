@@ -1,94 +1,90 @@
 import numpy as np
-from scipy.sparse.linalg import svds
-from scipy.sparse import csr_matrix
 import pandas as pd
+from scipy.sparse import csr_matrix
+from scipy.sparse.linalg import svds
+import logging
+
+# Set up logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 class CollaborativeFiltering:
-    """
-    A class to implement collaborative filtering using Singular Value Decomposition (SVD).
-    
-    Attributes:
-        user_item_matrix (pd.DataFrame): DataFrame containing the user-item interaction matrix.
-        movie_titles (pd.Index): Index of movie titles.
-        U (np.ndarray, optional): User matrix from SVD decomposition.
-        sigma (np.ndarray, optional): Diagonal matrix of singular values from SVD decomposition.
-        Vt (np.ndarray, optional): Movie matrix from SVD decomposition.
-    """
-    
     def __init__(self, user_item_matrix, movie_titles):
-        """
-        Initializes the CollaborativeFiltering with the user-item matrix and movie titles.
-        
-        Args:
-            user_item_matrix (pd.DataFrame): DataFrame containing the user-item interaction matrix.
-            movie_titles (pd.Index): Index of movie titles.
-        """
         self.user_item_matrix = user_item_matrix
         self.movie_titles = movie_titles
         self.U, self.sigma, self.Vt = None, None, None
 
     def prepare_data(self):
         """
-        Prepares the data by converting the user-item matrix to a sparse matrix format, performing SVD,
-        and storing the decomposed matrices.
+        Prepare the collaborative filtering model by performing matrix factorization.
         """
         self.user_item_matrix = self.user_item_matrix.astype(float)
-        
         sparse_matrix = csr_matrix(self.user_item_matrix)
-        
-        # Decompose the matrix using SVD with a smaller k value
         num_users, num_movies = sparse_matrix.shape
-        k = min(num_users - 1, num_movies - 1, 10)  
-        
-        # Perform SVD
+        k = min(num_users - 1, num_movies - 1, 10)
         self.U, self.sigma, self.Vt = svds(sparse_matrix, k=k)
-        
-        # Convert sigma to a diagonal matrix
         self.sigma = np.diag(self.sigma)
+        logging.info("Collaborative Filtering model prepared.")
 
     def recommend(self, user_idx, top_n=10):
         """
-        Generates movie recommendations for a given user based on collaborative filtering.
-        
+        Recommend movies for a given user index based on the collaborative filtering model.
+
         Args:
-            user_idx (int): Index of the user for whom recommendations are to be generated.
-            top_n (int, optional): Number of top recommendations to return. Defaults to 10.
-        
+            user_idx (int): The index of the user for whom recommendations are to be generated.
+            top_n (int): The number of top recommendations to return.
+
         Returns:
-            list: List of top-n recommended movie titles.
+            list: List of recommended movie titles.
         """
+        
         if self.U is None or self.sigma is None or self.Vt is None:
             self.prepare_data()
-        
-        # Predict scores for the user by multiplying the decomposed matrices
         predicted_scores = np.dot(np.dot(self.U, self.sigma), self.Vt)[user_idx, :]
-        
-        # Sort and get the indices of the top N recommendations
         recommended_idx = np.argsort(predicted_scores)[::-1]
-        
-        # Map indices to movie titles
         recommended_items = self.movie_titles[recommended_idx[:top_n]].tolist()
-        
         return recommended_items
 
-def generate_synthetic_user_item_matrix(data, num_users=10, seed=42):
-    """
-    Generates a synthetic user-item interaction matrix with random ratings.
-    
-    Args:
-        data (pd.DataFrame): DataFrame containing movie data with a 'title' column.
-        num_users (int, optional): Number of synthetic users to generate. Defaults to 100.
-        seed (int, optional): Random seed for reproducibility. Defaults to 42.
-    
-    Returns:
-        pd.DataFrame: DataFrame with synthetic user-item interaction matrix.
-        pd.Index: Index of movie titles.
-    """
-    np.random.seed(seed)
 
+    def evaluate_performance(self, test_data):
+        """
+        Evaluate the performance of the collaborative filtering model using mean squared error.
+
+        Args:
+            test_data (pd.DataFrame): DataFrame containing the test user-item matrix.
+
+        Returns:
+            float: Mean Squared Error (MSE) of the model.
+        """
+        test_matrix = csr_matrix(test_data)
+        num_users, num_movies = test_matrix.shape
+        k = min(num_users - 1, num_movies - 1, 10)
+        self.U, self.sigma, self.Vt = svds(csr_matrix(self.user_item_matrix), k=k)
+        self.sigma = np.diag(self.sigma)
+        predicted_ratings = np.dot(np.dot(self.U, self.sigma), self.Vt)
+        test_ratings = test_matrix.toarray()
+        mse = np.mean((test_ratings - predicted_ratings) ** 2)
+        logging.info(f"Collaborative Filtering model performance: MSE = {mse:.4f}")
+        return mse
+
+    def update_user_item_matrix(self, feedback):
+        """
+        Update the user-item matrix based on user feedback.
+
+        Args:
+            feedback (dict): Dictionary with movie titles as keys and feedback ratings as values.
+        """
+        for movie, rating in feedback.items():
+            if movie in self.user_item_matrix.columns:
+                movie_idx = self.user_item_matrix.columns.get_loc(movie)
+                self.user_item_matrix.iloc[0, movie_idx] = rating  # Update for user 0 as an example
+        logging.info("User feedback incorporated into the user-item matrix.")
+        # Recompute the model with updated matrix
+        self.prepare_data()
+        
+def generate_synthetic_user_item_matrix(data, num_users=10, seed=42):
+    np.random.seed(seed)
     user_item_matrix = np.random.randint(1, 6, size=(num_users, len(data)))
-    
     user_item_matrix = user_item_matrix.astype(float)
-    
     user_item_df = pd.DataFrame(user_item_matrix, columns=data['title'])
     return user_item_df, data['title']
+
