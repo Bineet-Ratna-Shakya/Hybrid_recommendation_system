@@ -27,7 +27,6 @@ class ContentBasedFiltering:
         similar_movies = sorted(similar_movies, key=lambda x: x[1], reverse=True)
         recommended_movies = [self.data['title'].iloc[i[0]] for i in similar_movies[1:top_n+1]]
         
-        # Adjust recommendations based on feedback
         if self.feedback:
             feedback_adjusted = {movie: score + self.feedback.get(movie, 0) for movie, score in zip(recommended_movies, range(1, top_n+1))}
             sorted_feedback = sorted(feedback_adjusted.items(), key=lambda x: x[1], reverse=True)
