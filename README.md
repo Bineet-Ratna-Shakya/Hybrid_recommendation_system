@@ -582,6 +582,24 @@ To save user feedback on movie recommendations to a CSV file.
   - **Input Fields**: Allows users to input movie titles and user indices.
   - **Buttons**: Facilitates actions such as generating recommendations and submitting ratings.
   - **Tables**: Displays recommendations and feedback options in an organized manner.
+ 
+## Run Guide
+
+### Files
+1. **`main.py`**:
+   - Contains the full implementation of all functions, including a robust feedback system and comprehensive recommendation features.
+   - Recommended for use as it has the most up-to-date functionality.
+
+2. **`dashboard.py`**:
+   - Includes a similar set of functionalities but is slightly behind on the feedback system implementation.
+   - Suitable for use, but note that the feedback system may not be as advanced as in `main.py`.
+
+### Execution
+- To run the program, execute either of the following commands in your terminal:
+  - `python main.py`
+  - `python dashboard.py`
+
+- Ensure that all necessary dependencies are installed and the required data files are in place before running the scripts.
 
 # References
 
