@@ -26,10 +26,6 @@ ncf.train(epochs=5)
 # Print model weights
 ncf.print_model_weight_summary()
 
-# Generate Visualizations
-#visualizations.plot_histogram_of_ratings(data_cleaned)
-#visualizations.plot_user_item_interaction_matrix(user_item_matrix)
-#visualizations.plot_user_item_ratings_heatmap(user_item_matrix)
 
 def get_movie_title(data):
     while True:
