@@ -4,26 +4,21 @@ from content_based_filtering import ContentBasedFiltering
 from deep_learning_model import NeuralCollaborativeFiltering
 from hybrid_model import HybridFiltering
 from utils import save_feedback
-import visualizations  # Import the visualization module
 
 # Load and preprocess the data
 data_cleaned = pd.read_csv('/Users/soul/Documents/hybrid_recommendation_system/data/Netflix-encoded-Data.csv')
 
-# Generate user-item matrix and movie titles
 num_synthetic_users = 10  # Number of synthetic users
 user_item_matrix, movie_titles = generate_synthetic_user_item_matrix(data_cleaned, num_users=num_synthetic_users)
 
-# Initialize models
 content_filter = ContentBasedFiltering(data_cleaned)
 collab_filter = CollaborativeFiltering(user_item_matrix, movie_titles)
 hybrid_filter = HybridFiltering(data_cleaned, user_item_matrix, movie_titles, embedding_dim=20)
 hybrid_filter.prepare_models()
 
-# Initialize and train Neural Collaborative Filtering model
 ncf = NeuralCollaborativeFiltering(user_item_matrix, movie_titles, embedding_dim=20)
 ncf.train(epochs=5)
 
-# Print model weights
 ncf.print_model_weight_summary()
 
 
@@ -69,7 +64,6 @@ def continue_or_exit():
         else:
             print("Invalid choice. Please enter 'yes' or 'no'.")
 
-# Main program loop
 print("\n" + "="*40)
 print("WELCOME TO THE HYBRID RECOMMENDATION SYSTEM")
 print("="*40)
@@ -98,11 +92,9 @@ while True:
     #visualizations.plot_top_n_recommendations(hybrid_recommendations, user_index)
     #visualizations.plot_recommendation_comparison(content_recommendations, collaborative_recommendations, hybrid_recommendations)
 
-    # Collect user feedback
     feedback = hybrid_filter.collect_user_feedback(hybrid_recommendations)
     save_feedback(feedback)  # Save the feedback for future use
 
-    # Update models with user feedback
     collab_filter.update_user_item_matrix(feedback)  # Update collaborative filtering model
     hybrid_filter.ncf_model.incorporate_feedback(feedback)  # Update NCF model with feedback
     
