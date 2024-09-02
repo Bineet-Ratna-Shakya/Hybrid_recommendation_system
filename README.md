@@ -351,6 +351,238 @@ class HybridFiltering:
 - **main branch**: Implements the hybrid recommendation system using collaborative filtering (SVD) and content-based filtering (TF-IDF and Cosine Similarity).
 - **deep-learning branch**: Enhances the hybrid model with deep learning techniques like Neural Collaborative Filtering (NCF) or Autoencoders.
 
+# TASK FOUR
+# Neural Collaborative Filtering (NCF) Workflow :
+**deep-learning branch**
+
+# deep_learning_model.py changes
+## Data Preparation
+1. **Convert Interaction Matrix**: Convert the user-item interaction matrix into a dataframe and process it for use in training.
+2. **Map Identifiers**: Map user and movie identifiers to numerical indices.
+3. **Data Splitting**: Split the data into training and validation sets and prepare it for TensorFlow processing.
+
+## Model Building
+1. **Define Neural Network**:
+   - **Embedding Layers**: Use embedding layers for users and movies.
+   - **Flatten and Concatenate**: Flatten embeddings and concatenate them.
+   - **Dense Hidden Layer**: Add a dense hidden layer.
+   - **Output Layer**: Add an output layer.
+2. **Compile Model**:
+   - **Loss Function**: Use binary cross-entropy loss function.
+   - **Optimizer**: Use Adam optimizer.
+
+## Training
+1. **Train Model**: Train the model on the training data.
+2. **Early Stopping**: Use early stopping to avoid overfitting.
+
+## Recommendation
+1. **Predict Ratings**: Predict ratings for all items for a given user.
+2. **Top N Items**: Return the top N items based on these predictions.
+
+## Performance Evaluation
+1. **Evaluate Model**:
+   - **Mean Squared Error (MSE)**: Calculate MSE.
+   - **Root Mean Squared Error (RMSE)**: Calculate RMSE.
+
+## Feedback Incorporation
+1. **Update Model**: Incorporate new user feedback into the model.
+2. **Retrain and Adjust**: Retrain the model and adjust the datasets accordingly.
+
+## Model Weight Summary
+1. **Weights Summary**: Provide a summary of the model’s weights, including their shape and statistical properties.
+
+# collaborative_filtering.py changes
+
+# Matrix Factorization Workflow
+
+## Data Preparation
+1. **Convert Interaction Matrix**: Convert the user-item interaction matrix into a sparse matrix.
+2. **Matrix Factorization**: Perform matrix factorization using Singular Value Decomposition (SVD) to decompose the matrix into latent factors.
+
+## Recommendation
+1. **Predict Ratings**: For a given user index, predict ratings for all items by reconstructing the matrix from the latent factors.
+2. **Top N Recommendations**: Return the top N movie recommendations based on predicted scores.
+
+## Performance Evaluation
+1. **Evaluate Model**: Calculate the Mean Squared Error (MSE) between predicted ratings and actual ratings from a test dataset.
+
+## Feedback Incorporation
+1. **Update Matrix**: Update the user-item matrix with new user feedback.
+2. **Recompute Model**: Recompute the model to reflect the updated feedback.
+
+## Synthetic Data Generation
+1. **Generate Synthetic Data**: Generate a synthetic user-item matrix for testing purposes.
+2. **Create Random Ratings**: Create random ratings and convert them into a DataFrame with movie titles.
+
+# content_based_filtering.py changes
+# Content-Based Recommendation Workflow
+
+## Data Preparation
+1. **Content Aggregation**: Combine several text fields (description, cast, listed_in, director) into a single content field.
+2. **TF-IDF Matrix**: Convert the aggregated content into a TF-IDF matrix, which represents the importance of words in the context of the dataset.
+
+## Recommendation
+1. **Similarity Computation**: Compute cosine similarity between movies based on the TF-IDF matrix.
+2. **Retrieve Recommendations**: Find and sort movies similar to the given movie based on similarity scores.
+3. **Feedback Adjustment**: Adjust recommendations if user feedback is available, modifying scores based on feedback to influence the recommendations.
+
+## User Feedback Collection
+1. **Prompt for Ratings**: Ask users to rate the recommended movies on a scale from 1 to 5.
+2. **Update Feedback**: Update the internal feedback dictionary with the user’s ratings.
+
+# hybrid_model.py changes
+# Hybrid System Workflow
+
+## Initialization
+1. **Models Setup**: Initialize instances of three different filtering models:
+   - `ContentBasedFiltering` for content-based recommendations.
+   - `CollaborativeFiltering` for collaborative recommendations.
+   - `NeuralCollaborativeFiltering` for deep learning-based recommendations.
+
+## Model Preparation
+1. **Data Preparation**: Call `prepare_data` on each model to ensure they are ready for generating recommendations.
+
+## Recommendation Generation
+1. **Retrieve Recommendations**:
+   - Get top N movie recommendations from each filtering model:
+     - Content-based
+     - Collaborative
+     - Neural collaborative
+
+2. **Combine Recommendations**:
+   - **Aggregating Recommendations**:
+     - Content-based recommendations have a weight of `content_weight`.
+     - Collaborative filtering recommendations have a weight of `collab_weight`.
+     - Neural collaborative filtering recommendations have a weight of `ncf_weight`.
+   - **Weight Aggregation**: Add weights for each movie based on its presence in the recommendations from different models.
+
+3. **Sort and Select Top N**:
+   - Sort the aggregated recommendations by weight.
+   - Select the top N movies.
+
+## User Feedback Collection
+1. **Feedback Collection**:
+   - Use the `collect_user_feedback` method from the `ContentBasedFiltering` model to gather user ratings for recommended movies.
+
+# main.py changes
+
+## Data Loading and Initialization
+1. **Load Data**: Read a CSV file containing the data.
+2. **Generate User-Item Matrix**: Create a synthetic user-item matrix and movie titles for recommendations.
+
+## Model Initialization
+1. **Content-Based Filtering**: Initialize the content-based recommendation model.
+2. **Collaborative Filtering**: Initialize the collaborative filtering model with the synthetic user-item matrix.
+3. **Hybrid Filtering**: Initialize the hybrid recommendation model combining different filtering approaches.
+4. **Neural Collaborative Filtering**: Initialize and train a neural collaborative filtering model.
+
+## User Input Functions
+1. **Get Movie Title**: Prompt the user to enter a movie title and validate the input.
+2. **Get User Index**: Prompt the user to enter a synthetic user index and validate the input.
+
+## Recommendation Generation
+1. **Content-Based Recommendations**: Generate movie recommendations based on content similarity.
+2. **Collaborative Recommendations**: Generate movie recommendations based on user-item interactions.
+3. **Hybrid Recommendations**: Combine content-based, collaborative, and neural recommendations using weights.
+
+## Display and Visualizations
+1. **Display Recommendations**: Print out the top movie recommendations for each filtering approach.
+2. **Visualizations (Commented Out)**: Optionally generate and display visualizations for the recommendations (code for plotting is commented out).
+
+## Feedback Collection and Model Update
+1. **Collect Feedback**: Prompt the user to rate the recommended movies and save the feedback.
+2. **Update Models**: Incorporate the user feedback into the collaborative filtering model and neural collaborative filtering model.
+
+## Loop and Exit
+1. **Main Program Loop**: Repeat the process of getting recommendations and collecting feedback until the user decides to exit.
+
+## End of Program
+1. **Exit Message**: Print a message indicating the end of the recommendation session.
+
+# Additonal Files
+## utils.py
+# Function Definition: `save_feedback`
+
+## Purpose
+To save user feedback on movie recommendations to a CSV file.
+
+## Arguments
+- **feedback**: A dictionary where keys are movie titles and values are user ratings.
+- **file_path**: The path to the CSV file where the feedback will be appended.
+
+## Process
+1. **Convert Feedback to DataFrame**:
+   - Converts the feedback dictionary into a Pandas DataFrame with two columns: `movie` and `rating`.
+
+2. **Save to CSV**:
+   - Appends the DataFrame to a CSV file at the specified path.
+   - If the file does not exist, it will be created.
+   - The header is not written again if the file already exists.
+
+3. **Logging**:
+   - Logs a message indicating that the user feedback has been successfully saved.
+
+# GUI Application: Hybrid Movie Recommendation System
+
+## Data and Model Initialization
+1. **Load Data**:
+   - Loads movie data and generates synthetic user-item matrices.
+2. **Model Initialization**:
+   - Initializes and prepares content-based, collaborative filtering, and neural collaborative filtering models.
+
+## Recommendation Generation
+1. **User Input**:
+   - Users input a movie title and a synthetic user index.
+2. **Generate Recommendations**:
+   - The application generates recommendations using content-based, collaborative, and hybrid methods.
+3. **Display Recommendations**:
+   - Recommendations are displayed in a structured format.
+
+## Feedback Collection
+1. **Rate Movies**:
+   - Allows users to rate the recommended movies.
+2. **Update Model**:
+   - Updates the neural collaborative filtering model with the feedback.
+
+## GUI Components
+1. **Tkinter Interface**:
+   - Uses Tkinter to create a full-screen application.
+   - Includes input fields, buttons, and tables to display recommendations and feedback options.
+
+# Overall changes
+# Features of the Hybrid Movie Recommendation System
+
+## 1. Data and Model Initialization
+- **Load Movie Data**: Imports movie data and creates a synthetic user-item interaction matrix.
+- **Initialize Models**:
+  - **Content-Based Filtering**: Uses movie attributes for recommendations.
+  - **Collaborative Filtering**: Utilizes user-item interaction data for recommendations.
+  - **Neural Collaborative Filtering**: Applies deep learning techniques for recommendations.
+
+## 2. Recommendation Generation
+- **User Input**:
+  - **Movie Title**: Users can enter a movie title to base recommendations on.
+  - **User Index**: Users provide a synthetic user index for personalized recommendations.
+- **Generate Recommendations**:
+  - **Content-Based**: Recommends movies similar to the input title based on content features.
+  - **Collaborative**: Suggests movies based on user-item interactions and preferences.
+  - **Hybrid**: Combines content-based, collaborative, and neural methods to provide comprehensive recommendations.
+- **Display Recommendations**:
+  - Presents recommendations in a clear and organized format.
+
+## 3. Feedback Collection
+- **Rate Movies**:
+  - Users can rate the recommended movies on a scale from 1 to 5.
+- **Update Model**:
+  - Integrates user feedback into the neural collaborative filtering model to refine future recommendations.
+
+## 4. GUI Components
+- **Tkinter Interface**:
+  - **Full-Screen Application**: Provides a user-friendly, full-screen interface.
+  - **Input Fields**: Allows users to input movie titles and user indices.
+  - **Buttons**: Facilitates actions such as generating recommendations and submitting ratings.
+  - **Tables**: Displays recommendations and feedback options in an organized manner.
+
 # References
 
 ## General Recommender System Resources
