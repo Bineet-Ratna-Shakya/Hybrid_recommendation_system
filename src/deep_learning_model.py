@@ -21,6 +21,7 @@ class NeuralCollaborativeFiltering:
         self.num_movies = user_item_matrix.shape[1]
         self.embedding_dim = embedding_dim
         self.batch_size = batch_size
+        self.batch_size = batch_size
         self.model = self.build_model()
         self.prepare_data()
 
